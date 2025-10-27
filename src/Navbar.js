@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Box, Button, IconButton, Tooltip, Switch, FormControlLabel } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Button, FormControlLabel, Switch, Tooltip, IconButton } from '@mui/material';
 import { Brightness4 as Brightness4Icon, Brightness7 as Brightness7Icon, LocationOn as LocationOnIcon, AccountCircle as AccountCircleIcon, Login as LoginIcon } from '@mui/icons-material';
-import { useTheme, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUserContext } from './UserContext';
 
@@ -11,8 +11,6 @@ const Navbar = ({ darkMode, onThemeToggle }) => {
   const { user, logoutUser } = useUserContext();
   const theme = useTheme();
   const navigate = useNavigate();
-
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -29,6 +27,8 @@ const Navbar = ({ darkMode, onThemeToggle }) => {
         },
         () => setLocation("Location Unavailable")
       );
+    } else {
+      setLocation("Location Unavailable");
     }
   }, []);
 
@@ -53,48 +53,21 @@ const Navbar = ({ darkMode, onThemeToggle }) => {
   }, []);
 
   return (
-    <AppBar
-      position="fixed"
-      sx={{ bgcolor: '#4a266e', boxShadow: scrolling ? 3 : 0 }}
-    >
-      <Toolbar
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between'
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 'bold', flexShrink: 0 }}
-          component={Link}
-          to="/"
-          style={{ textDecoration: 'none', color: 'inherit' }}
-        >
-          Bookit
+    <AppBar position="fixed" sx={{ bgcolor: '#4a266e', boxShadow: scrolling ? 3 : 0 }}>
+      <Toolbar>
+        <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            Bookit
+          </Link>
         </Typography>
-
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: isMobile ? 1 : 2,
-            flexWrap: 'nowrap'
-          }}
-        >
-          {!isMobile && (
-            <Button color="inherit" component={Link} to="/list-event">
-              List an Event
-            </Button>
-          )}
-
-          <IconButton color="inherit" sx={{ display: { xs: 'none', sm: 'flex' } }}>
-            <LocationOnIcon fontSize="small" />
-            {!isMobile && (
-              <Typography sx={{ ml: 0.5 }} variant="body2">
-                {location}
-              </Typography>
-            )}
-          </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button color="inherit" component={Link} to="/list-event">List an Event</Button> {/* Added Button */}
+          <Button
+            color="inherit"
+            startIcon={<LocationOnIcon />}
+          >
+            {location || "Current Location"}
+          </Button>
 
           {user ? (
             <>
@@ -103,25 +76,13 @@ const Navbar = ({ darkMode, onThemeToggle }) => {
                   <AccountCircleIcon />
                 </IconButton>
               </Tooltip>
-              {!isMobile && (
-                <Button color="inherit" onClick={handleLogout}>
-                  Logout
-                </Button>
-              )}
+              <Button color="inherit" onClick={handleLogout}>Logout</Button>
             </>
           ) : (
-            <Button
-              color="inherit"
-              component={Link}
-              to="/login"
-              startIcon={!isMobile && <LoginIcon />}
-            >
-              {isMobile ? <LoginIcon /> : 'Login'}
-            </Button>
+            <Button color="inherit" component={Link} to="/login" startIcon={<LoginIcon />}>Login</Button>
           )}
 
           <FormControlLabel
-            sx={{ ml: isMobile ? 0 : 1 }}
             control={
               <Switch
                 checked={darkMode}
@@ -131,9 +92,13 @@ const Navbar = ({ darkMode, onThemeToggle }) => {
               />
             }
           />
+          
         </Box>
+        
       </Toolbar>
+
     </AppBar>
+    
   );
 };
 
